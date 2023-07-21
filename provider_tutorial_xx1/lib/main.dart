@@ -22,13 +22,18 @@ class HomePage extends StatelessWidget {
     return ChangeNotifierProvider<Counter>(
       create: (context) => Counter(),
       child: Scaffold(
-        body: Consumer<Counter>(
-          builder: (context, value, child) => Center(
-            child: Text(
-              "${value.counter}",
-              style: Theme.of(context).textTheme.displayLarge,
-            ),
-          ),
+        // Selector will check the counter value, if the previous value is same with current then don't rebuild
+        body: Selector<Counter, int>(
+          selector: (context, value) => value.counter,
+          builder: (context, value, child) {
+            print("rebuild: Selector");
+            return Center(
+              child: Text(
+                "$value",
+                style: Theme.of(context).textTheme.displayLarge,
+              ),
+            );
+          },
         ),
         floatingActionButton: Consumer<Counter>(
           builder: (context, value, child) => Row(
@@ -53,9 +58,11 @@ class HomePage extends StatelessWidget {
 
 class Counter with ChangeNotifier {
   int counter = 0;
+  double _counter = 0;
 
   void increament() {
-    counter++;
+    _counter += .5;
+    counter = _counter.toInt();
     notifyListeners();
   }
 
